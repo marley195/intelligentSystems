@@ -4,11 +4,11 @@ Processing the data
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-
+from sklearn.model_selection import train_test_split
 
 def process_data(train, test, lags):
     """Process data
-    Reshape and split train\test data.
+    Reshape and split train est data.
 
     # Arguments
         train: String, name of .csv train file.
@@ -20,6 +20,11 @@ def process_data(train, test, lags):
         X_test: ndarray.
         y_test: ndarray.
         scaler: StandardScaler.
+    """
+     df = pd.read_excel(train, encoding='utf-8', header=1).fillna(0)
+    
+
+
     """
     attr = 'Lane 1 Flow (Veh/5 Minutes)'
     df1 = pd.read_csv(train, encoding='utf-8').fillna(0)
@@ -45,4 +50,6 @@ def process_data(train, test, lags):
     X_test = test[:, :-1]
     y_test = test[:, -1]
 
-    return X_train, y_train, X_test, y_test, scaler
+    return X_train, y_train, X_test, y_test, scaler"""
+
+    

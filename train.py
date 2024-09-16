@@ -26,16 +26,16 @@ def train_model(model, X_train, y_train, name, config):
     """
 
     model.compile(loss="mse", optimizer="rmsprop", metrics=['mape'])
-    # early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
+    early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
     hist = model.fit(
         X_train, y_train,
         batch_size=config["batch"],
         epochs=config["epochs"],
         validation_split=0.05)
 
-    model.save('model/' + name + '.h5')
+    model.save(f'model/{name}.h5')
     df = pd.DataFrame.from_dict(hist.history)
-    df.to_csv('model/' + name + ' loss.csv', encoding='utf-8', index=False)
+    df.to_csv(f'model/{name}_loss.csv', encoding='utf-8', index=False)
 
 
 def train_seas(models, X_train, y_train, name, config):
@@ -51,17 +51,17 @@ def train_seas(models, X_train, y_train, name, config):
     """
 
     temp = X_train
-    # early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
+    early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
 
     for i in range(len(models) - 1):
         if i > 0:
             p = models[i - 1]
-            hidden_layer_model = Model(input=p.input,
-                                       output=p.get_layer('hidden').output)
+            hidden_layer_model = Model(p.input,
+                                       p.get_layer('hidden').output)
             temp = hidden_layer_model.predict(temp)
 
         m = models[i]
-        m.compile(loss="mse", optimizer="rmsprop", metrics=['mape'])
+        m.compile(loss="mse", optimizer="adam", metrics=['mape'])
 
         m.fit(temp, y_train, batch_size=config["batch"],
               epochs=config["epochs"],
@@ -86,7 +86,7 @@ def main(argv):
     args = parser.parse_args()
 
     lag = 12
-    config = {"batch": 256, "epochs": 600}
+    config = {"batch": 256, "epochs": 100}
     file1 = 'data/train.csv'
     file2 = 'data/test.csv'
     X_train, y_train, _, _, _ = process_data(file1, file2, lag)
