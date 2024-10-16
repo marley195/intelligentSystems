@@ -17,7 +17,7 @@ warnings.filterwarnings("ignore")
 
 def MAPE(y_true, y_pred):
     """Mean Absolute Percentage Error
-    Calculate the mape.
+    Calculate the mape. 
 
     # Arguments
         y_true: List/ndarray, ture data.
@@ -102,9 +102,8 @@ def main():
     names = ['LSTM', 'GRU', 'SAEs']
 
     lag = 12
-    file1 = 'data/train.csv'
-    file2 = 'data/test.csv'
-    _, _, X_test, y_test, scaler = process_data(file1, file2, lag)
+    data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
+    _, _, X_test, y_test, scaler = process_data(data, lag)
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
 
     y_preds = []

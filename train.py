@@ -51,7 +51,7 @@ def train_seas(models, X_train, y_train, name, config):
     """
 
     temp = X_train
-    early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
+    # early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
 
     for i in range(len(models) - 1):
         if i > 0:
@@ -86,22 +86,21 @@ def main(argv):
     args = parser.parse_args()
 
     lag = 12
-    config = {"batch": 256, "epochs": 100}
-    file1 = 'data/train.csv'
-    file2 = 'data/test.csv'
-    X_train, y_train, _, _, _ = process_data(file1, file2, lag)
+    config = {"batch": 256, "epochs": 20}
+    data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
+    X_train, y_train, _, _, _ = process_data(data, lag)
 
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_lstm([12, 64, 64, 1])
+        m = model.get_lstm([lag, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'gru':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_gru([12, 64, 64, 1])
+        m = model.get_gru([lag, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'saes':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
-        m = model.get_saes([12, 400, 400, 400, 1])
+        m = model.get_saes([lag, 400, 400, 400, 1])
         train_seas(m, X_train, y_train, args.model, config)
 
 
