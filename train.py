@@ -86,21 +86,22 @@ def main(argv):
     args = parser.parse_args()
 
     lag = 12
-    config = {"batch": 256, "epochs": 20}
+    config = {"batch": 256, "epochs": 50}
     data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
-    X_train, y_train, _, _, _ = process_data(data, lag)
+    X_train, _, y_train, _, _, _ = process_data(data, lag)
+    print(X_train.shape)
 
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_lstm([lag, 64, 64, 1])
+        m = model.get_lstm([lag + 2, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'gru':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_gru([lag, 64, 64, 1])
+        m = model.get_gru([lag + 2, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'saes':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
-        m = model.get_saes([lag, 400, 400, 400, 1])
+        m = model.get_saes([lag + 2, 400, 400, 400, 1])
         train_seas(m, X_train, y_train, args.model, config)
 
 

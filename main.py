@@ -93,7 +93,6 @@ def plot_results(y_true, y_preds, names):
 
     plt.show()
 
-
 def main():
     lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
@@ -103,25 +102,44 @@ def main():
 
     lag = 12
     data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
-    _, _, X_test, y_test, scaler = process_data(data, lag)
-    y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
+    _, X_test, _, y_test, flow_scaler, latlong_scaler = process_data(data, lag)
+    y_test = np.vectorize(flow_scaler.inverse_transform(y_test))
 
-    y_preds = []
     for name, model in zip(names, models):
+        # Reshape X_test based on the model requirements
         if name == 'SAEs':
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
         else:
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+        # Plot the model structure
         file = 'images/' + name + '.png'
         plot_model(model, to_file=file, show_shapes=True)
-        predicted = model.predict(X_test)
-        predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
-        y_preds.append(predicted[:288])
+        y_pred = model.predict(X_test)
+        # Now, rescale the predictions back to their original values
+        y_pred_rescaled = flow_scaler.inverse_transform(y_pred.reshape(-1, 1))
+        y_test_rescaled = flow_scaler.inverse_transform(y_test.reshape(-1, 1))
+        #Rescale latitude and longitude data (if needed)
+        X_test_latlong = X_test[:, :2]  # Extract the latlong columns (first two columns)
+        X_test_latlong_rescaled = latlong_scaler.inverse_transform(X_test_latlong)
+
+
+
+        """
+        print(name)
+        # Model prediction
+        print(f'predicted shape: {predicted.shape}')
+        print(f'y_test shape {y_test.shape}')
+        # Check shape before inverse transform
+        print(f'Predicted shape for {name}: {predicted.shape}')
+        # Append first 288 predictions
+        y_preds.append(predicted[:periods])
+
+        # Evaluate model performance
         print(name)
         eva_regress(y_test, predicted)
 
-    plot_results(y_test[: 288], y_preds, names)
-
-
+    # Plot results
+    plot_results(y_test[:periods], y_preds, names)
+"""
 if __name__ == '__main__':
     main()
