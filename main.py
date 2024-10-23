@@ -1,5 +1,5 @@
 """
-Traffic Flow Prediction with Neural Networks(SAEs、LSTM、GRU).
+Traffic Flow Prediction with Neural Networks(SAEs、LSTM、GRU, RNN).
 """
 import math
 import warnings
@@ -11,13 +11,12 @@ from tensorflow.keras.utils import plot_model
 import sklearn.metrics as metrics
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-
 warnings.filterwarnings("ignore")
 
 
 def MAPE(y_true, y_pred):
     """Mean Absolute Percentage Error
-    Calculate the mape. 
+    Calculate the mape.
 
     # Arguments
         y_true: List/ndarray, ture data.
@@ -93,53 +92,37 @@ def plot_results(y_true, y_preds, names):
 
     plt.show()
 
+
 def main():
+    rnn = load_model('model/simplernn.h5')
     lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
     saes = load_model('model/saes.h5')
-    models = [lstm, gru, saes]
-    names = ['LSTM', 'GRU', 'SAEs']
+    models = [lstm, gru, saes, rnn]
+    names = ['LSTM', 'GRU', 'SAEs', 'RNN']
 
     lag = 12
-    data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
-    _, X_test, _, y_test, flow_scaler, latlong_scaler = process_data(data, lag)
-    y_test = np.vectorize(flow_scaler.inverse_transform(y_test))
+    file1 = 'data/train.csv'
+    file2 = 'data/test.csv'
+    _, _, X_test, y_test, scaler = process_data(file1, file2, lag)
+    y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
 
+    y_preds = []
     for name, model in zip(names, models):
-        # Reshape X_test based on the model requirements
         if name == 'SAEs':
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1]))
         else:
             X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-        # Plot the model structure
         file = 'images/' + name + '.png'
         plot_model(model, to_file=file, show_shapes=True)
-        y_pred = model.predict(X_test)
-        # Now, rescale the predictions back to their original values
-        y_pred_rescaled = flow_scaler.inverse_transform(y_pred.reshape(-1, 1))
-        y_test_rescaled = flow_scaler.inverse_transform(y_test.reshape(-1, 1))
-        #Rescale latitude and longitude data (if needed)
-        X_test_latlong = X_test[:, :2]  # Extract the latlong columns (first two columns)
-        X_test_latlong_rescaled = latlong_scaler.inverse_transform(X_test_latlong)
-
-
-
-        """
-        print(name)
-        # Model prediction
-        print(f'predicted shape: {predicted.shape}')
-        print(f'y_test shape {y_test.shape}')
-        # Check shape before inverse transform
-        print(f'Predicted shape for {name}: {predicted.shape}')
-        # Append first 288 predictions
-        y_preds.append(predicted[:periods])
-
-        # Evaluate model performance
+        predicted = model.predict(X_test)
+        predicted = scaler.inverse_transform(predicted.reshape(-1, 1)).reshape(1, -1)[0]
+        y_preds.append(predicted[:288])
         print(name)
         eva_regress(y_test, predicted)
 
-    # Plot results
-    plot_results(y_test[:periods], y_preds, names)
-"""
+    plot_results(y_test[: 288], y_preds, names)
+
+
 if __name__ == '__main__':
     main()
