@@ -15,6 +15,11 @@ import matplotlib.pyplot as plt
 warnings.filterwarnings("ignore")
 
 
+"""
+    Notes:
+    Current Model: LSTM is training really well, for some reason GRU/SAES are completely off on their predictions.
+"""
+
 def MAPE(y_true, y_pred):
     """Mean Absolute Percentage Error
     Calculate the mape. 
@@ -68,20 +73,35 @@ def plot_results(y_true, y_preds, names):
     Plot the true data and predicted data.
 
     # Arguments
-        y_true: List/ndarray, ture data.
-        y_pred: List/ndarray, predicted data.
+        y_true: List/ndarray, true data.
+        y_preds: List/ndarray, predicted data.
         names: List, Method names.
     """
     d = '2016-3-4 00:00'
-    x = pd.date_range(d, periods=288, freq='5min')
+    x = pd.date_range(d, periods=288, freq='15min')  # 288 periods at 15-minute intervals
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
+    # Plot true data
     ax.plot(x, y_true, label='True Data')
-    for name, y_pred in zip(names, y_preds):
-        ax.plot(x, y_pred, label=name)
 
+
+    ### Loop through the predictions and plot them
+    #for name, y_pred in zip(names, y_preds):
+    #    # Ensure y_pred is a numpy array and reshape if necessary
+    #    y_pred = np.array(y_pred)  # Convert to NumPy array if it's not already
+    #    if y_pred.ndim == 0:  # If y_pred is a scalar, convert it to an array of 288 repeated values
+    #        y_pred = np.full(288, y_pred)
+    #    elif y_pred.ndim == 1 and y_pred.shape[0] != 288:
+    #        y_pred = y_pred[:288]  # Ensure that y_pred has 288 points, truncate if necessary
+    #    elif y_pred.ndim > 1:  # If y_pred has more than one dimension, flatten it
+    #        y_pred = y_pred.flatten()[:288]
+    #    # Plot predicted data
+    #    ax.plot(x, y_pred, label=name)
+#
+    ax.plot(x, y_preds, label=names)
+    #Formatting the plot
     plt.legend()
     plt.grid(True)
     plt.xlabel('Time of Day')
@@ -93,6 +113,7 @@ def plot_results(y_true, y_preds, names):
 
     plt.show()
 
+
 def main():
     lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
@@ -103,7 +124,6 @@ def main():
     lag = 12
     data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
     _, X_test, _, y_test, flow_scaler, latlong_scaler = process_data(data, lag)
-    y_test = np.vectorize(flow_scaler.inverse_transform(y_test))
 
     for name, model in zip(names, models):
         # Reshape X_test based on the model requirements
@@ -115,31 +135,20 @@ def main():
         file = 'images/' + name + '.png'
         plot_model(model, to_file=file, show_shapes=True)
         y_pred = model.predict(X_test)
-        # Now, rescale the predictions back to their original values
         y_pred_rescaled = flow_scaler.inverse_transform(y_pred.reshape(-1, 1))
         y_test_rescaled = flow_scaler.inverse_transform(y_test.reshape(-1, 1))
-        #Rescale latitude and longitude data (if needed)
-        X_test_latlong = X_test[:, :2]  # Extract the latlong columns (first two columns)
-        X_test_latlong_rescaled = latlong_scaler.inverse_transform(X_test_latlong)
-
-
-
-        """
+        print(f" y test: {y_test_rescaled[:20]}")
+        print(f" y pred: {y_pred_rescaled[:20]}")
         print(name)
-        # Model prediction
-        print(f'predicted shape: {predicted.shape}')
-        print(f'y_test shape {y_test.shape}')
-        # Check shape before inverse transform
-        print(f'Predicted shape for {name}: {predicted.shape}')
-        # Append first 288 predictions
-        y_preds.append(predicted[:periods])
 
         # Evaluate model performance
         print(name)
-        eva_regress(y_test, predicted)
+        eva_regress(y_test_rescaled[:288], y_pred_rescaled[:288])
 
     # Plot results
-    plot_results(y_test[:periods], y_preds, names)
-"""
+    plot_results(y_test_rescaled[:288], y_pred_rescaled[:288], names)
+
+
+
 if __name__ == '__main__':
     main()
