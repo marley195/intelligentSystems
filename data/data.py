@@ -60,17 +60,16 @@ def process_data(df_path, lags):
     train_data = np.array(train_data)
 
 
-    #Printing inversed data to check for accuracy and conistency.
+    ##testing for data accruacy
     #first_two_cols = train_data[:, :2]
     #first_two_cols_scaled = latlong_scaler.inverse_transform(first_two_cols)
     #remaining_cols = train_data[:, 2:]
     #remaining_cols_scaled = data_scaler.inverse_transform(remaining_cols)
-    #combined_data = np.hstack((first_two_cols_scaled, remaining_cols_scaled))#
+    #combined_data = np.hstack((first_two_cols_scaled, remaining_cols_scaled))
     #df_train_data = pd.DataFrame(combined_data)
-    #
-    #df_train_data.to_csv("test_data_review.csv")
+    #df_train_data.to_csv("Scaled_data_review.csv")
     #print(combined_data)
-    
+    #
     X = np.array(train_data)
     y = np.array(targets)
 

@@ -74,39 +74,31 @@ def plot_results(y_true, y_preds, names):
 
     # Arguments
         y_true: List/ndarray, true data.
-        y_preds: List/ndarray, predicted data.
+        y_preds: List of ndarray, predicted data for each model.
         names: List, Method names.
     """
     d = '2016-3-4 00:00'
-    x = pd.date_range(d, periods=288, freq='15min')  # 288 periods at 15-minute intervals
+    x = pd.date_range(d, periods=len(y_true), freq='15min')  # Make sure the length matches y_true
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
+    fig, ax = plt.subplots()
 
     # Plot true data
     ax.plot(x, y_true, label='True Data')
 
+    # Colors for each model (use colors without trailing spaces)
+    colors = ['coral', 'violet', 'lightgreen']
 
-    ### Loop through the predictions and plot them
-    #for name, y_pred in zip(names, y_preds):
-    #    # Ensure y_pred is a numpy array and reshape if necessary
-    #    y_pred = np.array(y_pred)  # Convert to NumPy array if it's not already
-    #    if y_pred.ndim == 0:  # If y_pred is a scalar, convert it to an array of 288 repeated values
-    #        y_pred = np.full(288, y_pred)
-    #    elif y_pred.ndim == 1 and y_pred.shape[0] != 288:
-    #        y_pred = y_pred[:288]  # Ensure that y_pred has 288 points, truncate if necessary
-    #    elif y_pred.ndim > 1:  # If y_pred has more than one dimension, flatten it
-    #        y_pred = y_pred.flatten()[:288]
-    #    # Plot predicted data
-    #    ax.plot(x, y_pred, label=name)
-#
-    ax.plot(x, y_preds, label=names)
-    #Formatting the plot
+    # Loop through each model's predictions and plot them
+    for y_pred, name, color in zip(y_preds, names, colors):
+        ax.plot(x, y_pred, label=name, color=color)
+
+    # Formatting the plot
     plt.legend()
     plt.grid(True)
     plt.xlabel('Time of Day')
     plt.ylabel('Flow')
 
+    # Set time format for x-axis labels
     date_format = mpl.dates.DateFormatter("%H:%M")
     ax.xaxis.set_major_formatter(date_format)
     fig.autofmt_xdate()
@@ -118,13 +110,14 @@ def main():
     lstm = load_model('model/lstm.h5')
     gru = load_model('model/gru.h5')
     saes = load_model('model/saes.h5')
-    models = [lstm, gru, saes]
-    names = ['LSTM', 'GRU', 'SAEs']
-
+    rnn = load_model('model/simplernn.h5')
+    models = [lstm, gru, saes, rnn]
+    names = ['LSTM', 'GRU', 'SAEs', 'RNN']
+    periods = 288
     lag = 12
     data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
-    _, X_test, _, y_test, flow_scaler, latlong_scaler = process_data(data, lag)
-
+    _, X_test, _, y_test, flow_scaler, _ = process_data(data, lag)
+    y_preds = []
     for name, model in zip(names, models):
         # Reshape X_test based on the model requirements
         if name == 'SAEs':
@@ -137,16 +130,13 @@ def main():
         y_pred = model.predict(X_test)
         y_pred_rescaled = flow_scaler.inverse_transform(y_pred.reshape(-1, 1))
         y_test_rescaled = flow_scaler.inverse_transform(y_test.reshape(-1, 1))
-        print(f" y test: {y_test_rescaled[:20]}")
-        print(f" y pred: {y_pred_rescaled[:20]}")
+        eva_regress(y_test_rescaled[:periods], y_pred_rescaled[:periods])
         print(name)
-
+        y_preds.append(y_pred_rescaled[:periods].flatten())
         # Evaluate model performance
         print(name)
-        eva_regress(y_test_rescaled[:288], y_pred_rescaled[:288])
-
     # Plot results
-    plot_results(y_test_rescaled[:288], y_pred_rescaled[:288], names)
+    plot_results(y_test_rescaled[:periods], y_preds, names)
 
 
 
