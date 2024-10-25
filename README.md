@@ -47,18 +47,19 @@ batch_szie: 256
 
 ```
 python main.py
+
 ```
 
 These are the details for the traffic flow prediction experiment from 10 epoch
 
-| Metrics | MAE  |  MSE  | RMSE |  MAPE  |   R2   | Explained variance score |
-| ------- | :--: | :---: | :--: | :----: | :----: | :----------------------: |
-| LSTM    | 7.21 | 98.05 | 9.90 | 16.56% | 0.9396 |          0.9419          |
-| GRU     | 7.20 | 99.32 | 9.97 | 16.78% | 0.9389 |          0.9389          |
-| SAEs    | 7.06 | 92.08 | 9.60 | 17.80% | 0.9433 |          0.9442          |
-| RNN     | ---- | ----- | ---- | ------ | ------ | ------------------------ |
+| Metrics | MAE  |  MSE   | RMSE |  MAPE  |   R2   | Explained variance score |
+| ------- | :--: | :----: | :--: | :----: | :----: | :----------------------: |
+| LSTM    | 7.21 | 98.05  | 9.90 | 16.56% | 0.9396 |          0.9419          |
+| GRU     | 13.5 | 448.24 | 21.1 | 25.86% | 0.9425 |         0.943976         |
+| SAEs    | 13.0 | 393.80 | 19.8 | 23.01% | 0.9495 |         0.949538         |
+| RNN     | 13.9 | 425.88 | 20.6 | 26.06% | 0.9454 |         0:948789         |
 
-![evaluate](/images/eva.png)
+![evaluate](/images/eva_final.png)
 
 ## Reference
 
