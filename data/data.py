@@ -73,7 +73,10 @@ def process_data(df_path, lags):
     X = np.array(train_data)
     y = np.array(targets)
 
+    data = df.drop_duplicates(subset=['NB_LATITUDE', 'NB_LONGITUDE'])
+
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, train_size=.75)
     print(f"X train shape:{X_train.shape}")
     print(f" Y train shape{y_train.shape}")
-    return X_train, X_test, y_train, y_test, data_scaler, latlong_scaler
+    return data, X_train, X_test, y_train, y_test, data_scaler, latlong_scaler

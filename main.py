@@ -5,12 +5,15 @@ import math
 import warnings
 import numpy as np
 import pandas as pd
+import networkx as nx
+from geopy.distance import geodesic
 from data.data import process_data
 from keras.models import load_model
 from tensorflow.keras.utils import plot_model
 import sklearn.metrics as metrics
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import tensorflow as tf
 
 warnings.filterwarnings("ignore")
 
@@ -105,18 +108,47 @@ def plot_results(y_true, y_preds, names):
 
     plt.show()
 
+###ADD CODE FOR ROUTING 
+
+def estimate_travel_time(vol_a, vol_b, dist, speed_limit=60, intersection_delay=30):
+    avg_volume = (vol_a + vol_b) / 2
+    base_time = dist / (speed_limit / 60)
+    total_time = base_time + intersection_delay + (avg_volume / 100)
+    return total_time
+
+def build_graph(data, vol_data):
+    G = nx.Graph()
+    for i, row_a in data.iterrows():
+        for j, row_b in data.iterrows():
+            if i != j:
+                dist = geodesic((row_a['NB_LATITUDE'], row_a['NB_LONGITUDE']),
+                                (row_b['NB_LATITUDE'], row_b['NB_LONGITUDE'])).km
+                if dist <= 1:
+                    travel_time = estimate_travel_time(vol_data[i], vol_data[j], dist)
+                    G.add_edge(row_a['SCATS Number'], row_b['SCATS Number'], weight=travel_time)
+    return G
+
+def find_routes(G, origin, destination):
+    try:
+        routes = list(nx.shortest_simple_paths(G, source=origin, target=destination, weight='weight'))[:5]
+    except nx.NetworkXNoPath:
+        routes = []
+    return routes
+
+##ADDED CODED FOR ROUTING^
 
 def main():
-    lstm = load_model('model/lstm.h5')
-    gru = load_model('model/gru.h5')
-    saes = load_model('model/saes.h5')
-    rnn = load_model('model/simplernn.h5')
+    custom_objects = {'MeanSquaredError': tf.keras.losses.MeanSquaredError, 'mse': tf.keras.losses.MeanSquaredError}
+    lstm = load_model('model/lstm.h5', custom_objects=custom_objects)
+    gru = load_model('model/gru.h5', custom_objects=custom_objects)
+    saes = load_model('model/saes.h5', custom_objects=custom_objects)
+    rnn = load_model('model/simplernn.h5', custom_objects=custom_objects)
     models = [lstm, gru, saes, rnn]
     names = ['LSTM', 'GRU', 'SAEs', 'RNN']
     periods = 288
     lag = 12
     data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
-    _, X_test, _, y_test, flow_scaler, _ = process_data(data, lag)
+    data, _, X_test, _, y_test, flow_scaler, _ = process_data(data, lag)
     y_preds = []
     for name, model in zip(names, models):
         # Reshape X_test based on the model requirements
@@ -136,7 +168,26 @@ def main():
         # Evaluate model performance
         print(name)
     # Plot results
-    plot_results(y_test_rescaled[:periods], y_preds, names)
+    #plot_results(y_test_rescaled[:periods], y_preds, names)
+    # Graph-based Route Guidance
+    origin = int(input("Enter the origin SCATS number: "))
+    destination = int(input("Enter the destination SCATS number: "))
+    G = build_graph(data, y_test_rescaled.flatten())
+    print("Graph nodes:", G.nodes())
+    print("Graph edges:", G.edges(data=True))
+
+
+    routes = find_routes(G, origin, destination)
+
+    if not routes:
+        print("No routes found between the specified SCATS numbers.")
+        return
+
+    # Output routes and their travel times
+    for i, route in enumerate(routes):
+        print(f"Route {i + 1}: {route}")
+        total_time = sum(G[u][v]['weight'] for u, v in zip(route[:-1], route[1:]))
+        print(f"Estimated travel time: {total_time:.2f} minutes")
 
 
 

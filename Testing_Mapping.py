@@ -7,11 +7,9 @@ import folium
 def main():
     lags = 12
     #Retrieve data from dataset and put into
-    test = "/Users/marleywetini/repos/intelligentSystems/data/test.csv"
-    train = "/Users/marleywetini/repos/intelligentSystems/data/train.csv"
-    scats_data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 20063.xlsx'
-    train_data = pd.read_csv(test, header=1)
-    test_data = pd.read_csv(train, header=1)
+
+    scats_data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.xlsx'
+
 
     scats_data = pd.read_excel(scats_data, header=1).fillna(0)
     scats_coordinates = scats_data[['Location', 'NB_LATITUDE', 'NB_LONGITUDE']].drop_duplicates()
@@ -58,9 +56,12 @@ def main():
 # Create a map centered around the first SCATS location
     m = folium.Map(location=[scats_coordinates['NB_LATITUDE'].mean(), scats_coordinates['NB_LONGITUDE'].mean()], zoom_start=12)
 
-    # Add SCATS locations as markers
+    # Add SCATS locations as markers, including SCATS number in the popup
     for i, row in scats_coordinates.iterrows():
-        folium.Marker([row['NB_LATITUDE'], row['NB_LONGITUDE']], popup=f'SCATS {row["Location"]}').add_to(m)
+        folium.Marker(
+            [row['NB_LATITUDE'], row['NB_LONGITUDE']],
+            popup=f'SCATS {row["Location"]} - Number: {row["SCATS Number"]}'
+        ).add_to(m)
 
     # Add lines between neighboring SCATS
     for i, row in scats_neighbors_df.iterrows():

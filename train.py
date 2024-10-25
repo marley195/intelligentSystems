@@ -86,7 +86,7 @@ def main(argv):
     lag = 12
     config = {"batch": 256, "epochs": 200}
     data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
-    X_train, _, y_train, _, _, _ = process_data(data, lag)
+    data, X_train, _, y_train, _, _, _ = process_data(data, lag)
     
     if args.model == 'simplernn':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
