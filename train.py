@@ -86,8 +86,8 @@ def main(argv):
     args = parser.parse_args()
 
     lag = 12
-    config = {"batch": 256, "epochs": 50}
-    data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
+    config = {"batch": 256, "epochs": 5}
+    data = '/Users/Ansh Sehgal/intelligentSystems/data/Scats Data October 2006.csv'
     X_train, _, y_train, _, _, _ = process_data(data, lag)
     print(X_train.shape)
 
