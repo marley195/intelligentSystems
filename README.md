@@ -33,11 +33,12 @@ run setup.sh to create and downlaod the required dependencies
 python train.py --model model_name
 ```
 
-You can choose "lstm", "gru", "saes" or "RNN" as arguments. The `.h5` weight file was saved at model folder.
+You can choose "lstm", "gru", "saes" or "simplernn" as arguments. The `.h5` weight file was saved at model folder.
 
 ## Experiment
 
 Data are obtained from VicRoads for the city Borondara that containts traffic flow data (the number of cars passing anintersection every 15 minutes).
+
 dataset: PeMS 5min-interval traffic flow data
 optimizer: RMSprop(lr=0.001, rho=0.9, epsilon=1e-06)
 batch_szie: 256

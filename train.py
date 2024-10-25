@@ -90,7 +90,7 @@ def main(argv):
     
     if args.model == 'simplernn':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_rnn([12, 64, 64, 1])
+        m = model.get_rnn([lag + 2, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
