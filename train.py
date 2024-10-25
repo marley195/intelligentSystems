@@ -12,11 +12,9 @@ from keras.models import Model
 from keras.callbacks import EarlyStopping
 warnings.filterwarnings("ignore")
 
-
 def train_model(model, X_train, y_train, name, config):
     """train
     train a single model.
-
     # Arguments
         model: Model, NN model to train.
         X_train: ndarray(number, lags), Input data for train.
@@ -86,11 +84,14 @@ def main(argv):
     args = parser.parse_args()
 
     lag = 12
-    config = {"batch": 256, "epochs": 5}
-    data = '/Users/Ansh Sehgal/intelligentSystems/data/Scats Data October 2006.csv'
+    config = {"batch": 256, "epochs": 200}
+    data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
     X_train, _, y_train, _, _, _ = process_data(data, lag)
-    print(X_train.shape)
-
+    
+    if args.model == 'simplernn':
+        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+        m = model.get_rnn([lag + 2, 64, 64, 1])
+        train_model(m, X_train, y_train, args.model, config)
     if args.model == 'lstm':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         m = model.get_lstm([lag + 2, 64, 64, 1])
@@ -101,7 +102,7 @@ def main(argv):
         train_model(m, X_train, y_train, args.model, config)
     if args.model == 'saes':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
-        m = model.get_saes([lag + 2, 400, 400, 400, 1])
+        m = model.get_saes([lag + 2, 200, 100, 50, 1])
         train_seas(m, X_train, y_train, args.model, config)
 
 
