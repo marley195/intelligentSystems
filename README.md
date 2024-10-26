@@ -13,13 +13,13 @@ Using bundooras SCAT data we implement a terminal based system which can calucat
 - scikit-learn 1.3.1
 - MutPy 0.6.1
 - numpy 1.24.4
-- openyx1 3.15 (read/write xlsm files)
-- xlrd 2.0.1 (read/write xls files)
-  Graphical requuirements
+- openyx1 3.15
+- xlrd 2.0.1
 - folium 0.17.0
 - geopy 2.4.1
 - graphviz 0.20.3
 - matploylib 3.9.2
+- networkx 2.7.3
 
 ## Setup Virtual Environment
 
@@ -47,6 +47,9 @@ batch_szie: 256
 
 ```
 python main.py
+
+Input SCAT Number (beginning position)
+Input SCAT Number (Destination position)
 
 ```
 
