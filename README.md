@@ -50,11 +50,11 @@ python main.py
 
 ```
 
-These are the details for the traffic flow prediction experiment from 10 epoch
+These are the details for the traffic flow prediction experiment from 200 epoch
 
 | Metrics | MAE  |  MSE   | RMSE |  MAPE  |   R2   | Explained variance score |
 | ------- | :--: | :----: | :--: | :----: | :----: | :----------------------: |
-| LSTM    | 7.21 | 98.05  | 9.90 | 16.56% | 0.9396 |          0.9419          |
+| LSTM    | 13.3 | 453.76 | 21.3 | 25.03% | 0.9418 |         0.942165         |
 | GRU     | 13.5 | 448.24 | 21.1 | 25.86% | 0.9425 |         0.943976         |
 | SAEs    | 13.0 | 393.80 | 19.8 | 23.01% | 0.9495 |         0.949538         |
 | RNN     | 13.9 | 425.88 | 20.6 | 26.06% | 0.9454 |         0:948789         |

@@ -168,7 +168,7 @@ def main():
         # Evaluate model performance
         print(name)
     # Plot results
-    #plot_results(y_test_rescaled[:periods], y_preds, names)
+    plot_results(y_test_rescaled[:periods], y_preds, names)
     # Graph-based Route Guidance
     origin = int(input("Enter the origin SCATS number: "))
     destination = int(input("Enter the destination SCATS number: "))
