@@ -10,3 +10,4 @@ geopy==2.4.1
 graphviz==0.20.3
 matploylib==3.9.2
 networkx==2.7.3
+tkinter==0.1.0
