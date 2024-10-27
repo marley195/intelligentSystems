@@ -20,6 +20,7 @@ Using bundooras SCAT data we implement a terminal based system which can calucat
 - graphviz 0.20.3
 - matploylib 3.9.2
 - networkx 2.7.3
+- tkinker 0.1.0
 
 ## Setup Virtual Environment
 
