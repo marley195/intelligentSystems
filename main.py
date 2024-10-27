@@ -10,6 +10,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from routing import build_graph, find_routes
+import os
 warnings.filterwarnings("ignore")
 
 def MAPE(y_true, y_pred):
@@ -107,7 +108,7 @@ def main():
     names = ['LSTM', 'GRU', 'SAEs', 'RNN']
     periods = 288
     lag = 12
-    data = '/Users/marleywetini/repos/intelligentSystems/data/Scats Data October 2006.csv'
+    data = os.path.join(os.path.dirname(__file__), "data", "Scats Data October 2006.csv")
     data, _, X_test, _, y_test, flow_scaler, _ = process_data(data, lag)
     y_preds = []
     for name, model in zip(names, models):
