@@ -47,10 +47,8 @@ batch_szie: 256
 
 ```
 python main.py
-
 Input SCAT Number (beginning position)
 Input SCAT Number (Destination position)
-
 ```
 
 These are the details for the traffic flow prediction experiment from 200 epoch
